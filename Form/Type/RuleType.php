@@ -39,7 +39,7 @@ class RuleType extends AbstractType
     {
         $builder
             ->addEventSubscriber(new BuildRuleFormListener($this->checkerRegistry, $builder->getFormFactory()))
-            ->add('type', 'sylius_promotion_rule_choice', array(
+            ->add('type', RuleChoiceType::class, array(
                 'label' => 'sylius.form.rule.type'
             ))
         ;
@@ -55,8 +55,13 @@ class RuleType extends AbstractType
         ;
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_rule';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

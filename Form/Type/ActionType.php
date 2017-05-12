@@ -39,7 +39,7 @@ class ActionType extends AbstractType
     {
         $builder
             ->addEventSubscriber(new BuildActionFormListener($this->actionRegistry, $builder->getFormFactory()))
-            ->add('type', 'sylius_promotion_action_choice', array(
+            ->add('type', ActionChoiceType::class, array(
                 'label' => 'sylius.form.action.type'
             ))
         ;
@@ -55,8 +55,13 @@ class ActionType extends AbstractType
         ;
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_action';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

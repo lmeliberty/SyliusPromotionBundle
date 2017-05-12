@@ -12,6 +12,7 @@
 namespace Sylius\Bundle\PromotionBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -34,10 +35,10 @@ class CouponGenerateInstructionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('amount', 'integer', array(
+            ->add('amount', IntegerType::class, array(
                 'label' => 'sylius.form.coupon_generate_instruction.amount'
             ))
-            ->add('usageLimit', 'integer', array(
+            ->add('usageLimit', IntegerType::class, array(
                 'label' => 'sylius.form.coupon_generate_instruction.usage_limit'
             ))
         ;
@@ -53,8 +54,13 @@ class CouponGenerateInstructionType extends AbstractType
         ;
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_coupon_generate_instruction';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Sylius\Bundle\PromotionBundle\Form\Type\Action;
 
+use Sylius\Bundle\MoneyBundle\Form\Type\MoneyType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -37,7 +38,7 @@ class FixedDiscountConfigurationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('amount', 'sylius_money', array(
+            ->add('amount', MoneyType::class, array(
                 'label' => 'sylius.form.action.fixed_discount_configuration.amount',
                 'constraints' => array(
                     new NotBlank(),
@@ -56,8 +57,13 @@ class FixedDiscountConfigurationType extends AbstractType
         ;
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_action_fixed_discount_configuration';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

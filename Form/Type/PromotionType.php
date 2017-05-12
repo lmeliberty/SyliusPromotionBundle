@@ -14,6 +14,11 @@ namespace Sylius\Bundle\PromotionBundle\Form\Type;
 use JMS\TranslationBundle\Annotation\Ignore;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -45,37 +50,37 @@ class PromotionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text', array(
+            ->add('name', TextType::class, array(
                 'label' => 'sylius.form.promotion.name'
             ))
-            ->add('description', 'text', array(
+            ->add('description', TextType::class, array(
                 'label' => 'sylius.form.promotion.description'
             ))
-            ->add('exclusive', 'checkbox', array(
+            ->add('exclusive', CheckboxType::class, array(
                 'label' => 'sylius.form.promotion.exclusive'
             ))
-            ->add('usageLimit', 'integer', array(
+            ->add('usageLimit', IntegerType::class, array(
                 'label' => 'sylius.form.promotion.usage_limit'
             ))
-            ->add('startsAt', 'date', array(
+            ->add('startsAt', DateType::class, array(
                 'label' => 'sylius.form.promotion.starts_at',
                 'empty_value' => /** @Ignore */ array('year' => '-', 'month' => '-', 'day' => '-')
             ))
-            ->add('endsAt', 'date', array(
+            ->add('endsAt', DateType::class, array(
                 'label' => 'sylius.form.promotion.ends_at',
                 'empty_value' => /** @Ignore */ array('year' => '-', 'month' => '-', 'day' => '-')
             ))
-            ->add('couponBased', 'checkbox', array(
+            ->add('couponBased', CheckboxType::class, array(
                 'label' => 'sylius.form.promotion.coupon_based',
                 'required' => false
             ))
-            ->add('rules', 'collection', array(
+            ->add('rules', CollectionType::class, array(
                 'type'         => 'sylius_promotion_rule',
                 'allow_add'    => true,
                 'by_reference' => false,
                 'label'        => 'sylius.form.promotion.rules'
             ))
-            ->add('actions', 'collection', array(
+            ->add('actions', CollectionType::class, array(
                 'type'         => 'sylius_promotion_action',
                 'allow_add'    => true,
                 'by_reference' => false,
@@ -129,8 +134,13 @@ class PromotionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sylius_promotion';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }
