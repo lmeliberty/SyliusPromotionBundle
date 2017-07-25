@@ -13,7 +13,7 @@ namespace Sylius\Bundle\PromotionBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Promotion rule choice type.
@@ -29,12 +29,12 @@ class RuleChoiceType extends AbstractType
         $this->rules = $rules;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(array(
-                'choices' => $this->rules
-            ))
+            ->setDefaults([
+                'choices' => array_flip($this->rules)
+            ])
         ;
     }
 
