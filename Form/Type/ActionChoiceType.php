@@ -12,6 +12,7 @@
 namespace Sylius\Bundle\PromotionBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -21,27 +22,56 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ActionChoiceType extends AbstractType
 {
+    /**
+     * @var array
+     */
     protected $actions;
 
+    /**
+     * ActionChoiceType constructor.
+     *
+     * @param array $actions
+     */
     public function __construct(array $actions)
     {
         $this->actions = $actions;
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'choices' => array_flip($this->actions),
-        ]);
+        $resolver
+            ->setDefaults([
+                'choices' => $this->actions
+            ])
+        ;
     }
 
+    /**
+     * @return mixed
+     */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_action_choice';
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }
