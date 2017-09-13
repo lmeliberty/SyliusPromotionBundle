@@ -34,7 +34,11 @@ class ActionChoiceType extends AbstractType
      */
     public function __construct(array $actions)
     {
-        $this->actions = array_flip($this->actions);
+        if (null === $this->actions) {
+            $this->actions = $actions;
+        } else {
+            $this->actions = array_flip($this->actions);
+        }
     }
 
     /**
