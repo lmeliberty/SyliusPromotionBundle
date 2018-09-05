@@ -23,7 +23,7 @@
         "php": ">=5.3.3",
 
         "stof/doctrine-extensions-bundle": "^1.1.0",
-        "sylius/promotion":                "dev-sf3",
+        "sylius/promotion":                "0.10.3",
         "sylius/registry":                 "0.10.*@dev",
         "sylius/resource-bundle":          "0.10.*@dev",
         "symfony/framework-bundle":        "^3.0"
