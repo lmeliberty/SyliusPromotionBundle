@@ -20,21 +20,19 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|^7.0",
+        "php": ">=5.3.3",
 
-        "jms/translation-bundle": "1.1.*",
-        "stof/doctrine-extensions-bundle": "~1.1",
-        "sylius/promotion": "0.17.*",
-        "sylius/registry": "0.17.*",
-        "sylius/money-bundle": "0.17.*",
-        "sylius/resource-bundle": "0.17.*",
-        "symfony/framework-bundle": "^2.7.7"
+        "stof/doctrine-extensions-bundle": "^1.1.0",
+        "sylius/promotion":                "0.10.3",
+        "sylius/registry":                 "0.10.*@dev",
+        "sylius/resource-bundle":          "0.10.*@dev",
+        "symfony/framework-bundle":        "^3.0"
     },
     "require-dev": {
-        "phpspec/phpspec": "^2.4",
-        "doctrine/orm": "^2.4.8,<2.5",
-        "symfony/form": "^2.7",
-        "symfony/validator": "^2.7"
+        "phpspec/phpspec":   "~2.0",
+        "doctrine/orm":      "~2.2",
+        "symfony/form":      "^3.0",
+        "symfony/validator": "^3.0"
     },
     "config": {
         "bin-dir": "bin"
@@ -45,10 +43,10 @@
     "autoload-dev": {
         "psr-4": { "Sylius\\Bundle\\PromotionBundle\\spec\\": "spec/" }
     },
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "0.17-dev"
+            "dev-master": "0.10-dev"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }

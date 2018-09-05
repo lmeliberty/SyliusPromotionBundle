@@ -11,64 +11,136 @@
 
 namespace Sylius\Bundle\PromotionBundle\Form\Type;
 
-use Sylius\Bundle\ResourceBundle\Form\EventSubscriber\AddCodeFormSubscriber;
-use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use JMS\TranslationBundle\Annotation\Ignore;
+use Sylius\Component\Registry\ServiceRegistryInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
+ * Promotion form type.
+ *
  * @author Saša Stamenković <umpirsky@gmail.com>
  */
-class PromotionType extends AbstractResourceType
+class PromotionType extends AbstractType
 {
+    protected $dataClass;
+    protected $validationGroups;
+    protected $checkerRegistry;
+    protected $actionRegistry;
+
+    public function __construct($dataClass, array $validationGroups, ServiceRegistryInterface $checkerRegistry, ServiceRegistryInterface $actionRegistry)
+    {
+        $this->dataClass = $dataClass;
+        $this->validationGroups = $validationGroups;
+        $this->checkerRegistry = $checkerRegistry;
+        $this->actionRegistry = $actionRegistry;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text', [
-                'label' => 'sylius.form.promotion.name',
-            ])
-            ->add('description', 'text', [
-                'label' => 'sylius.form.promotion.description',
-            ])
-            ->add('exclusive', 'checkbox', [
-                'label' => 'sylius.form.promotion.exclusive',
-            ])
-            ->add('usageLimit', 'integer', [
-                'label' => 'sylius.form.promotion.usage_limit',
-            ])
-            ->add('startsAt', 'datetime', [
+            ->add('name', TextType::class, array(
+                'label' => 'sylius.form.promotion.name'
+            ))
+            ->add('description', TextType::class, array(
+                'label' => 'sylius.form.promotion.description'
+            ))
+            ->add('exclusive', CheckboxType::class, array(
+                'label' => 'sylius.form.promotion.exclusive'
+            ))
+            ->add('usageLimit', IntegerType::class, array(
+                'label' => 'sylius.form.promotion.usage_limit'
+            ))
+            ->add('startsAt', DateType::class, array(
                 'label' => 'sylius.form.promotion.starts_at',
-                'empty_value' => /* @Ignore */ ['year' => '-', 'month' => '-', 'day' => '-'],
-                'time_widget' => 'text',
-            ])
-            ->add('endsAt', 'datetime', [
+                'empty_value' => /** @Ignore */ array('year' => '-', 'month' => '-', 'day' => '-')
+            ))
+            ->add('endsAt', DateType::class, array(
                 'label' => 'sylius.form.promotion.ends_at',
-                'empty_value' => /* @Ignore */ ['year' => '-', 'month' => '-', 'day' => '-'],
-                'time_widget' => 'text',
-            ])
-            ->add('couponBased', 'checkbox', [
+                'empty_value' => /** @Ignore */ array('year' => '-', 'month' => '-', 'day' => '-')
+            ))
+            ->add('couponBased', CheckboxType::class, array(
                 'label' => 'sylius.form.promotion.coupon_based',
-                'required' => false,
-            ])
-            ->add('rules', 'sylius_promotion_rule_collection', [
-                'label' => 'sylius.form.promotion.rules',
-                'button_add_label' => 'sylius.form.promotion.add_rule',
-            ])
-            ->add('actions', 'sylius_promotion_action_collection', [
-                'label' => 'sylius.form.promotion.actions',
-                'button_add_label' => 'sylius.form.promotion.add_action',
-            ])
-            ->addEventSubscriber(new AddCodeFormSubscriber())
+                'required' => false
+            ))
+            ->add('rules', CollectionType::class, array(
+                'type'         => 'sylius_promotion_rule',
+                'allow_add'    => true,
+                'by_reference' => false,
+                'label'        => 'sylius.form.promotion.rules'
+            ))
+            ->add('actions', CollectionType::class, array(
+                'type'         => 'sylius_promotion_action',
+                'allow_add'    => true,
+                'by_reference' => false,
+                'label'        => 'sylius.form.promotion.actions'
+            ))
+        ;
+
+        $prototypes = array();
+        $prototypes['rules'] = array();
+
+        foreach ($this->checkerRegistry->all() as $type => $checker) {
+            $prototypes['rules'][$type] = $builder->create('__name__', $checker->getConfigurationFormType())->getForm();
+        }
+
+        $prototypes['actions'] = array();
+
+        foreach ($this->actionRegistry->all() as $type => $action) {
+            $prototypes['actions'][$type] = $builder->create('__name__', $action->getConfigurationFormType())->getForm();
+        }
+
+        $builder->setAttribute('prototypes', $prototypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['prototypes'] = array();
+
+        foreach ($form->getConfig()->getAttribute('prototypes') as $group => $prototypes) {
+            foreach ($prototypes as $type => $prototype) {
+                $view->vars['prototypes'][$group.'_'.$type] = $prototype->createView($view);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setDefaults(array(
+                'data_class'        => $this->dataClass,
+                'validation_groups' => $this->validationGroups,
+            ))
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sylius_promotion';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

@@ -46,7 +46,7 @@ class ActionChoiceType extends AbstractType
     {
         $resolver
             ->setDefaults([
-                'choices' => $this->actions
+                'choices' => array_flip($this->actions)
             ])
         ;
     }

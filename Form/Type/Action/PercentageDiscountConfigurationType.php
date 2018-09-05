@@ -12,7 +12,9 @@
 namespace Sylius\Bundle\PromotionBundle\Form\Type\Action;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
 
@@ -23,27 +25,45 @@ use Symfony\Component\Validator\Constraints\Type;
  */
 class PercentageDiscountConfigurationType extends AbstractType
 {
+    protected $validationGroups;
+
+    public function __construct(array $validationGroups)
+    {
+        $this->validationGroups = $validationGroups;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('percentage', 'percent', [
+            ->add('percentage', PercentType::class, array(
                 'label' => 'sylius.form.action.percentage_discount_configuration.percentage',
-                'constraints' => [
+                'constraints' => array(
                     new NotBlank(),
-                    new Type(['type' => 'numeric']),
-                ],
-            ])
+                    new Type(array('type' => 'numeric')),
+                )
+            ))
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setDefaults(array(
+                'validation_groups' => $this->validationGroups,
+            ))
+        ;
+    }
+
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_action_percentage_discount_configuration';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

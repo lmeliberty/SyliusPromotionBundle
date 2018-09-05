@@ -11,37 +11,57 @@
 
 namespace Sylius\Bundle\PromotionBundle\Form\Type;
 
-use Sylius\Bundle\ResourceBundle\Form\EventSubscriber\AddCodeFormSubscriber;
-use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
+ * Promotion coupon form type.
+ *
  * @author Saša Stamenković <umpirsky@gmail.com>
  */
-class CouponType extends AbstractResourceType
+class CouponType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected $dataClass;
+    protected $validationGroups;
+
+    public function __construct($dataClass, array $validationGroups)
+    {
+        $this->dataClass = $dataClass;
+        $this->validationGroups = $validationGroups;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('usageLimit', 'integer', [
-                'label' => 'sylius.form.coupon.usage_limit',
-            ])
-            ->add('expiresAt', 'date', [
-                'label' => 'sylius.form.coupon.expires_at',
-                'empty_value' => /* @Ignore */ ['year' => '-', 'month' => '-', 'day' => '-'],
-            ])
-            ->addEventSubscriber(new AddCodeFormSubscriber())
+            ->add('code', TextType::class, array(
+                'label' => 'sylius.form.coupon.code'
+            ))
+            ->add('usageLimit', IntegerType::class, array(
+                'label' => 'sylius.form.coupon.usage_limit'
+            ))
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setDefaults(array(
+                'data_class'        => $this->dataClass,
+                'validation_groups' => $this->validationGroups,
+            ))
+        ;
+    }
+
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_coupon';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

@@ -11,40 +11,56 @@
 
 namespace Sylius\Bundle\PromotionBundle\Form\Type;
 
-use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Coupon generate instruction type.
  *
  * @author Paweł Jędrzejewski <pawel@sylius.org>
  */
-class CouponGenerateInstructionType extends AbstractResourceType
+class CouponGenerateInstructionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected $dataClass;
+    protected $validationGroups;
+
+    public function __construct($dataClass, array $validationGroups)
+    {
+        $this->dataClass = $dataClass;
+        $this->validationGroups = $validationGroups;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('amount', 'integer', [
-                'label' => 'sylius.form.coupon_generate_instruction.amount',
-            ])
-            ->add('usageLimit', 'integer', [
-                'label' => 'sylius.form.coupon_generate_instruction.usage_limit',
-            ])
-            ->add('expiresAt', 'date', [
-                'label' => 'sylius.form.coupon_generate_instruction.expires_at',
-                'empty_value' => /* @Ignore */ ['year' => '-', 'month' => '-', 'day' => '-'],
-            ])
+            ->add('amount', IntegerType::class, array(
+                'label' => 'sylius.form.coupon_generate_instruction.amount'
+            ))
+            ->add('usageLimit', IntegerType::class, array(
+                'label' => 'sylius.form.coupon_generate_instruction.usage_limit'
+            ))
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setDefaults(array(
+                'data_class'        => $this->dataClass,
+                'validation_groups' => $this->validationGroups,
+            ))
+        ;
+    }
+
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_coupon_generate_instruction';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

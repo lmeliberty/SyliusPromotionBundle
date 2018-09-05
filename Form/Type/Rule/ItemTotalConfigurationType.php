@@ -11,43 +11,72 @@
 
 namespace Sylius\Bundle\PromotionBundle\Form\Type\Rule;
 
+use Sylius\Bundle\MoneyBundle\Form\Type\MoneyType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
+ * Item total rule configuration form type.
+ *
  * @author Saša Stamenković <umpirsky@gmail.com>
  */
 class ItemTotalConfigurationType extends AbstractType
 {
+    protected $validationGroups;
+
+    public function __construct(array $validationGroups)
+    {
+        $this->validationGroups = $validationGroups;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('amount', 'sylius_money', [
+            ->add('amount', MoneyType::class, array(
                 'label' => 'sylius.form.rule.item_total_configuration.amount',
-                'constraints' => [
+                'constraints' => array(
                     new NotBlank(),
-                    new Type(['type' => 'numeric']),
-                ],
-            ])
-            ->add('equal', 'checkbox', [
+                    new Type(array('type' => 'numeric')),
+                )
+            ))
+            ->add('equal', CheckboxType::class, array(
                 'label' => 'sylius.form.rule.item_total_configuration.equal',
-                'constraints' => [
-                    new Type(['type' => 'bool']),
-                ],
-            ])
+                'constraints' => array(
+                    new Type(array('type' => 'bool')),
+                )
+            ))
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setDefaults(array(
+                'validation_groups' => $this->validationGroups,
+            ))
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'sylius_promotion_rule_item_total_configuration';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }
